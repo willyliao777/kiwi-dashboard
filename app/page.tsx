@@ -448,7 +448,7 @@ export default function Dashboard() {
     const interval = setInterval(() => {
       if (!document.hidden) poll();
       setTick(t => t + 1);
-    }, 60000);
+    }, 15000);
     return () => clearInterval(interval);
   }, [poll]);
 
@@ -515,7 +515,7 @@ export default function Dashboard() {
                 )}
               </div>
               <div style={{ color: `${C.warm}25` }} className="text-xs font-mono">
-                auto-refresh every 60s
+                auto-refresh every 15s
               </div>
             </div>
 
