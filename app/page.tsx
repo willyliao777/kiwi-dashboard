@@ -580,7 +580,14 @@ export default function Dashboard() {
         </div>
 
         {/* SDK Integration */}
-        {apiUrl && <SDKSnippet apiUrl={apiUrl} />}
+        <div style={{ borderColor: C.border2, color: `${C.warm}50` }}
+          className="text-xs text-center border rounded-xl py-3">
+          用 <code className="font-mono">pip install kiwi-skin</code> 安裝 SDK，詳細接入文件請看{" "}
+          <a href="https://github.com/willyliao777/KIWI" target="_blank" rel="noopener noreferrer"
+            style={{ color: C.flesh }} className="underline">
+            GitHub →
+          </a>
+        </div>
 
         {/* Key Management */}
         <KeyManager />
