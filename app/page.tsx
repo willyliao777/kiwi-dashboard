@@ -450,7 +450,7 @@ export default function Dashboard() {
 
         {/* Footer */}
         <div style={{ color: `${C.warm}45` }} className="text-xs text-center pb-4">
-          KIWI Dashboard · Built by Willy Liao ·{" "}
+          KIWI Dashboard v0.2 · Built by Willy Liao ·{" "}
           <a href="https://github.com/willyliao777/KIWI"
             style={{ color: `${C.warm}30` }}
             className="hover:text-[#8DB600] transition-colors">
