@@ -529,11 +529,41 @@ export default function Dashboard() {
             </div>
 
             {events.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-20 gap-4">
-                <div className="text-4xl">🥝</div>
-                <div style={{ color: `${C.warm}30` }} className="text-sm text-center max-w-xs leading-relaxed">
-                  No threats detected yet. Integrate the KIWI SDK and start sending events.
+              <div className="flex flex-col items-center justify-center py-16 px-8 gap-8">
+                <div className="flex flex-col items-center gap-2">
+                  <div className="text-4xl">🥝</div>
+                  <div style={{ color: C.warm }} className="font-semibold text-base">還沒有任何威脅事件</div>
+                  <div style={{ color: `${C.warm}45` }} className="text-sm text-center">
+                    完成以下步驟，事件就會自動出現在這裡
+                  </div>
                 </div>
+
+                <div className="flex flex-col gap-3 w-full max-w-md">
+                  {[
+                    { step: "1", title: "安裝 KIWI SDK", desc: "pip install kiwi-skin", code: true },
+                    { step: "2", title: "在你的 AI agent 加上掃描", desc: "import kiwi · result = kiwi.scan_input(user_input)", code: true },
+                    { step: "3", title: "偵測到威脅時送到 Dashboard", desc: "requests.post(dashboard_url, ...)", code: true },
+                  ].map(({ step, title, desc, code }) => (
+                    <div key={step} style={{ borderColor: C.border2, background: `${C.flesh}06` }}
+                      className="flex items-start gap-3 px-4 py-3 rounded-xl border">
+                      <div style={{ background: `${C.flesh}20`, color: C.flesh }}
+                        className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-black shrink-0 mt-0.5">
+                        {step}
+                      </div>
+                      <div className="flex flex-col gap-0.5 min-w-0">
+                        <div style={{ color: C.warm }} className="text-sm font-semibold">{title}</div>
+                        <div style={{ color: `${C.warm}50` }}
+                          className={`text-xs ${code ? "font-mono" : ""} truncate`}>{desc}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <a href="https://github.com/willyliao777/KIWI" target="_blank" rel="noopener noreferrer"
+                  style={{ color: C.flesh, borderColor: `${C.flesh}40`, background: `${C.flesh}10` }}
+                  className="text-sm font-semibold px-5 py-2 rounded-full border">
+                  查看完整文件 →
+                </a>
               </div>
             ) : (
               <div>
