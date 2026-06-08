@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { redis, KINDS } from "@/lib/redis";
+import { redis, KINDS, validateApiKey } from "@/lib/redis";
 import type { ThreatEvent } from "@/lib/redis";
 
 export async function POST(req: NextRequest) {
   const apiKey = req.headers.get("x-api-key");
-  if (!apiKey || apiKey !== process.env.KIWI_API_KEY) {
+  if (!apiKey || !(await validateApiKey(apiKey))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

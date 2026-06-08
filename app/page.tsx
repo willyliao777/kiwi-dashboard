@@ -260,6 +260,140 @@ report("my-agent-prod", "tool_output", result)`;
   );
 }
 
+// ── Key Management ───────────────────────────────────────────────────────────
+interface ApiKey { id: string; name: string; createdAt: number; active: boolean; key: string; }
+
+function KeyManager() {
+  const [adminKey, setAdminKey]   = useState("");
+  const [unlocked, setUnlocked]   = useState(false);
+  const [keys, setKeys]           = useState<ApiKey[]>([]);
+  const [newName, setNewName]     = useState("");
+  const [newKey, setNewKey]       = useState<string | null>(null);
+  const [loading, setLoading]     = useState(false);
+  const [error, setError]         = useState("");
+
+  async function unlock() {
+    setLoading(true); setError("");
+    const res = await fetch("/api/keys", { headers: { "x-admin-key": adminKey } });
+    if (res.ok) { setKeys(await res.json()); setUnlocked(true); }
+    else setError("Wrong admin key");
+    setLoading(false);
+  }
+
+  async function create() {
+    if (!newName.trim()) return;
+    setLoading(true);
+    const res = await fetch("/api/keys", {
+      method: "POST",
+      headers: { "x-admin-key": adminKey, "Content-Type": "application/json" },
+      body: JSON.stringify({ name: newName.trim() }),
+    });
+    const data = await res.json();
+    setNewKey(data.key);
+    setKeys(prev => [{ id: data.id, name: newName.trim(), createdAt: Date.now(), active: true, key: data.key }, ...prev]);
+    setNewName("");
+    setLoading(false);
+  }
+
+  async function revoke(id: string) {
+    await fetch(`/api/keys/${id}`, { method: "DELETE", headers: { "x-admin-key": adminKey } });
+    setKeys(prev => prev.map(k => k.id === id ? { ...k, active: false } : k));
+    if (newKey) setNewKey(null);
+  }
+
+  return (
+    <div style={{ background: C.card2, borderColor: C.border }} className="rounded-2xl border overflow-hidden">
+      <div style={{ borderColor: C.border }} className="px-4 py-3 border-b flex items-center gap-2">
+        <span style={{ color: C.warm }} className="font-semibold">API Key 管理</span>
+        {unlocked && <span style={{ color: C.bright, background: `${C.flesh}15`, borderColor: `${C.flesh}40` }}
+          className="text-xs px-2 py-0.5 rounded-full border font-semibold">已解鎖</span>}
+      </div>
+
+      <div className="p-4">
+        {!unlocked ? (
+          <div className="flex gap-2">
+            <input
+              type="password"
+              placeholder="輸入 Admin Key 解鎖"
+              value={adminKey}
+              onChange={e => setAdminKey(e.target.value)}
+              onKeyDown={e => e.key === "Enter" && unlock()}
+              style={{ background: C.card, borderColor: C.border, color: C.warm }}
+              className="flex-1 text-sm px-3 py-2 rounded-lg border outline-none"
+            />
+            <button onClick={unlock} disabled={loading}
+              style={{ background: C.flesh, color: C.card2 }}
+              className="px-4 py-2 rounded-lg text-sm font-semibold cursor-pointer disabled:opacity-50">
+              {loading ? "…" : "解鎖"}
+            </button>
+            {error && <span style={{ color: "#f87171" }} className="text-xs self-center">{error}</span>}
+          </div>
+        ) : (
+          <div className="flex flex-col gap-4">
+            {/* New key just created */}
+            {newKey && (
+              <div style={{ background: `${C.flesh}12`, borderColor: `${C.flesh}40` }} className="rounded-xl border p-3 flex flex-col gap-1">
+                <div style={{ color: C.flesh }} className="text-xs font-semibold">新 Key 已建立 — 請立刻複製，只顯示一次</div>
+                <div style={{ color: C.warm, background: C.card, borderColor: C.border }}
+                  className="font-mono text-sm px-3 py-2 rounded-lg border break-all">{newKey}</div>
+              </div>
+            )}
+
+            {/* Create new key */}
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder="Key 名稱（例如：prod-agent-1）"
+                value={newName}
+                onChange={e => setNewName(e.target.value)}
+                onKeyDown={e => e.key === "Enter" && create()}
+                style={{ background: C.card, borderColor: C.border, color: C.warm }}
+                className="flex-1 text-sm px-3 py-2 rounded-lg border outline-none"
+              />
+              <button onClick={create} disabled={loading || !newName.trim()}
+                style={{ background: C.flesh, color: C.card2 }}
+                className="px-4 py-2 rounded-lg text-sm font-semibold cursor-pointer disabled:opacity-50">
+                {loading ? "…" : "+ 新增"}
+              </button>
+            </div>
+
+            {/* Keys list */}
+            {keys.length === 0 ? (
+              <div style={{ color: `${C.warm}35` }} className="text-xs text-center py-4">還沒有任何 key</div>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {keys.map(k => (
+                  <div key={k.id} style={{ borderColor: C.border2 }}
+                    className="flex items-center justify-between px-3 py-2 rounded-lg border">
+                    <div className="flex flex-col gap-0.5 min-w-0">
+                      <span style={{ color: C.warm }} className="text-sm font-semibold truncate">{k.name}</span>
+                      <span style={{ color: `${C.warm}40` }} className="text-xs font-mono">
+                        {k.key.slice(0, 20)}…
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3 shrink-0">
+                      <span style={{ color: k.active ? C.bright : `${C.warm}30` }} className="text-xs font-semibold">
+                        {k.active ? "啟用" : "已撤銷"}
+                      </span>
+                      {k.active && (
+                        <button onClick={() => revoke(k.id)}
+                          style={{ color: "#f87171", borderColor: "rgba(248,113,113,0.30)" }}
+                          className="text-xs border px-2 py-1 rounded-lg cursor-pointer">
+                          撤銷
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ── Main Dashboard ────────────────────────────────────────────────────────────
 export default function Dashboard() {
   const [events, setEvents]   = useState<ThreatEvent[]>([]);
@@ -447,6 +581,9 @@ export default function Dashboard() {
 
         {/* SDK Integration */}
         {apiUrl && <SDKSnippet apiUrl={apiUrl} />}
+
+        {/* Key Management */}
+        <KeyManager />
 
         {/* Footer */}
         <div style={{ color: `${C.warm}45` }} className="text-xs text-center pb-4">
