@@ -4,13 +4,13 @@ import { useState, useEffect, useCallback } from "react";
 
 // ── colour tokens ─────────────────────────────────────────────────────────────
 const C = {
-  bright:  "#8DB600",
-  flesh:   "#5a8a00",
-  warm:    "#f5f0e8",
-  card:    "#111009",
-  card2:   "#161410",
-  border:  "rgba(141,182,0,0.15)",
-  border2: "rgba(141,182,0,0.08)",
+  bright:  "#5a8a00",
+  flesh:   "#4a7200",
+  warm:    "#1a1a08",
+  card:    "#eeeade",
+  card2:   "#faf8f2",
+  border:  "rgba(74,114,0,0.22)",
+  border2: "rgba(74,114,0,0.12)",
 };
 
 const KIND_COLOR: Record<string, { text: string; bg: string; border: string }> = {
@@ -321,18 +321,18 @@ export default function Dashboard() {
     <main style={{ background: C.card, minHeight: "100vh" }}>
 
       {/* Nav */}
-      <nav style={{ borderColor: C.border, background: "#111009ee" }}
+      <nav style={{ borderColor: C.border, background: "#faf8f2ee" }}
         className="border-b sticky top-0 z-50 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <span className="text-xl">🥝</span>
             <div>
-              <span style={{ color: C.warm }} className="font-bold text-lg">KIWI</span>
-              <span style={{ color: `${C.warm}40` }} className="text-sm ml-2">Dashboard</span>
+              <span style={{ color: C.flesh }} className="font-bold text-lg">KIWI</span>
+              <span style={{ color: `${C.warm}60` }} className="text-sm ml-2">Dashboard</span>
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <div style={{ color: `${C.warm}35` }} className="text-xs font-mono hidden sm:block">
+            <div style={{ color: `${C.warm}55` }} className="text-xs font-mono hidden sm:block">
               {lastPoll ? `synced ${secondsSince}s ago` : "connecting…"}
             </div>
             <div style={{ color: C.bright, background: `${C.flesh}15`, borderColor: `${C.flesh}40` }}
@@ -446,7 +446,7 @@ export default function Dashboard() {
         {apiUrl && <SDKSnippet apiUrl={apiUrl} />}
 
         {/* Footer */}
-        <div style={{ color: `${C.warm}20` }} className="text-xs text-center pb-4">
+        <div style={{ color: `${C.warm}45` }} className="text-xs text-center pb-4">
           KIWI Dashboard · Built by Willy Liao ·{" "}
           <a href="https://github.com/willyliao777/KIWI"
             style={{ color: `${C.warm}30` }}
