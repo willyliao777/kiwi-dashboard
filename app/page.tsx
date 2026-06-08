@@ -311,7 +311,10 @@ export default function Dashboard() {
   useEffect(() => { poll(); }, [poll]);
 
   useEffect(() => {
-    const interval = setInterval(() => { poll(); setTick(t => t + 1); }, 3000);
+    const interval = setInterval(() => {
+      if (!document.hidden) poll();
+      setTick(t => t + 1);
+    }, 60000);
     return () => clearInterval(interval);
   }, [poll]);
 
@@ -378,7 +381,7 @@ export default function Dashboard() {
                 )}
               </div>
               <div style={{ color: `${C.warm}25` }} className="text-xs font-mono">
-                auto-refresh every 3s
+                auto-refresh every 60s
               </div>
             </div>
 
